@@ -12,7 +12,7 @@ if (!Date.prototype.toISOString) {
     }
 }
 
-function createHAR(address, title, startTime, resources, endTime, dom_element_count)
+function createHAR(address, title, startTime, resources, endTime, dom_element_count, content, status)
 {
    var bodySize = 0;
    resources.forEach(function (resource) {
@@ -48,14 +48,16 @@ function createHAR(address, title, startTime, resources, endTime, dom_element_co
                title: title,
                jscheck: page.jscheck,
                jscheckout: page.jscheckout,
-               pageTimings: {}
+               pageTimings: {},
+               pageText: content,
+               status: status
             }],
          }
    };
 }
 
 var page = require('webpage').create(),
-    system = require('system');
+system = require('system');
 page.viewportSize = { width: 1600, height: 1200 };
 
 if (system.args.length === 1) {
@@ -101,8 +103,11 @@ else {
       var dom_element_count = page.evaluate(function (s) {
          return document.getElementsByTagName('*').length;
       });
+      // pour la recherche
+      var content = page.plainText;
+      // fin
       page.jscheckout = page.evaluate(function (){return eval(arguments[0]);},page.jscheck);
-      har = createHAR(page.address, page.title, page.startTime, page.resources, new Date(), dom_element_count);
+      har = createHAR(page.address, page.title, page.startTime, page.resources, new Date(), dom_element_count, content,status);
       console.log(JSON.stringify(har, undefined, 4));
       phantom.exit();
    };
