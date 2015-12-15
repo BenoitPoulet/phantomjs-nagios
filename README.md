@@ -20,6 +20,7 @@ Command line
 - -p, --phantomjs [PATH]
 - -n, --netsniff [PATH]
 - -e, --html
+- -S, --string [STRING]
 - -j, --jscheck [STRING]
 - -l, --ps-extra-opts [STRING]
 - -r, --request [RANGE]
