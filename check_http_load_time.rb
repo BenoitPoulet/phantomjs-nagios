@@ -6,6 +6,8 @@ require 'time'
 require 'optparse'
 require 'timeout'
 
+# Following not working with ruby-1.8.7
+# ./check_http_load_time.rb:9: uninitialized constant Encoding (NameError)
 #Encoding.default_external = Encoding::UTF_8
 #Encoding.default_internal = Encoding::UTF_8
 

@@ -103,9 +103,9 @@ else {
       var dom_element_count = page.evaluate(function (s) {
          return document.getElementsByTagName('*').length;
       });
-      // pour la recherche
+      // Needed for looking for a string
       var content = page.plainText;
-      // fin
+
       page.jscheckout = page.evaluate(function (){return eval(arguments[0]);},page.jscheck);
       har = createHAR(page.address, page.title, page.startTime, page.resources, new Date(), dom_element_count, content,status);
       console.log(JSON.stringify(har, undefined, 4));
