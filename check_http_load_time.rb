@@ -62,9 +62,9 @@ OptionParser.new do |opts|
   opts.on("-e", "--html", "Add html tags to output url") do
     options[:html] = true
   end
-    opts.on("-S", "--string [STRING]", "String to look for") do |S|
+    opts.on("-S", "--string [STRING]", "String to look for") do |str|
         options[:search] = true
-        search_string = S
+        search_string = str
    end
     opts.on("-j", "--jscheck [STRING]", "Js check to eval") do |j|
     options[:jscheck] = j
@@ -162,7 +162,7 @@ rescue Timeout::Error => e
   Process.kill(9, @pipe.pid)
   Process.wait(@pipe.pid)
   exitcode = setExit(2, exitcode)
-  exit
+  exit exitcode
 end
 
 # Debug output
