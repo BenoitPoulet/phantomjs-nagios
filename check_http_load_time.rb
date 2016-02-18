@@ -142,7 +142,7 @@ if options[:warning].to_f > options[:critical].to_f
 end
 # Run Phantom
 begin
-  Timeout::timeout(options[:critical].to_i + 3) do
+  Timeout::timeout(options[:critical].to_i) do
     cmd = Array.new
     cmd << options[:phantomjs_bin]
     cmd << options[:phantomjs_opts]
