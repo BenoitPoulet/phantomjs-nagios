@@ -12,7 +12,7 @@ if (!Date.prototype.toISOString) {
     }
 }
 
-function createHAR(address, title, startTime, resources, endTime, dom_element_count, content, status)
+function createNagiosOuput(address, title, startTime, resources, endTime, dom_element_count, content, status)
 {
    var bodySize = 0;
    resources.forEach(function (resource) {
@@ -24,7 +24,7 @@ function createHAR(address, title, startTime, resources, endTime, dom_element_co
       }
       bodySize = bodySize + startReply.bodySize;
    });
-   // the first element of the resouces arry should be the request, so we track the load time
+   // the first element of the resouces array should be the request, so we track the load time
    var resource_initial_load_time = 0;
    if (resources[1] ) {
       resource_initial_load_time = resources[1].endTime - resources[1].startTime;
@@ -54,6 +54,81 @@ function createHAR(address, title, startTime, resources, endTime, dom_element_co
             }],
          }
    };
+}
+
+function createHAR(address, title, startTime, endTime, resources)
+{
+    var entries = [];
+
+    resources.forEach(function (resource) {
+        var request = resource.request,
+            startReply = resource.startReply,
+            endReply = resource.endReply;
+
+        if (!request || !startReply || !endReply) {
+            return;
+        }
+
+        entries.push({
+            startedDateTime: request.time.toISOString(),
+            time: endReply.time - request.time,
+            request: {
+                method: request.method,
+                url: request.url,
+                httpVersion: "HTTP/1.1",
+                cookies: [],
+                headers: request.headers,
+                queryString: [],
+                headersSize: -1,
+                bodySize: -1
+            },
+            response: {
+                status: endReply.status,
+                statusText: endReply.statusText,
+                httpVersion: "HTTP/1.1",
+                cookies: [],
+                headers: endReply.headers,
+                redirectURL: "",
+                headersSize: -1,
+                bodySize: startReply.bodySize,
+                content: {
+                    size: startReply.bodySize,
+                    mimeType: endReply.contentType
+                }
+            },
+            cache: {},
+            timings: {
+                blocked: 0,
+                dns: -1,
+                connect: -1,
+                send: 0,
+                wait: startReply.time - request.time,
+                receive: endReply.time - startReply.time,
+                ssl: -1
+            },
+            pageref: address
+        });
+    });
+
+    return {
+        log: {
+            version: '1.2',
+            creator: {
+                name: "PhantomJS",
+                version: phantom.version.major + '.' + phantom.version.minor +
+                    '.' + phantom.version.patch
+            },
+            pages: [{
+                startedDateTime: startTime.toISOString(),
+                id: address,
+                title: title,
+                pageTimings: {
+                    onLoad: endTime - startTime
+                }
+            }],
+            entries: entries
+        }
+    };
 }
 
 var page = require('webpage').create(),
@@ -105,11 +180,14 @@ else {
       });
       // Needed for looking for a string
       var content = page.plainText;
+      page.endTime = new Date();
 
       page.jscheckout = page.evaluate(function (){return eval(arguments[0]);},page.jscheck);
-      har = createHAR(page.address, page.title, page.startTime, page.resources, new Date(), dom_element_count, content,status);
+      har = createHAR(page.address, page.title, page.startTime, page.endTime, page.resources);
+      NagiosOuput = createNagiosOuput(page.address, page.title, page.startTime, page.resources, page.endTime, dom_element_count, content,status);
+      console.log(JSON.stringify(NagiosOuput, undefined, 4));
       console.log(JSON.stringify(har, undefined, 4));
       phantom.exit();
    };
    page.open(page.address);
-}
+ }
