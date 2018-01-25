@@ -186,6 +186,7 @@ else {
       har = createHAR(page.address, page.title, page.startTime, page.endTime, page.resources);
       NagiosOuput = createNagiosOuput(page.address, page.title, page.startTime, page.resources, page.endTime, dom_element_count, content,status);
       console.log(JSON.stringify(NagiosOuput, undefined, 4));
+      console.log("#### separator ####");
       console.log(JSON.stringify(har, undefined, 4));
       phantom.exit();
    };

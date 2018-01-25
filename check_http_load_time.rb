@@ -30,6 +30,7 @@ options[:search] = false
 exitcode = 0
 output = ""
 search_string = ""
+hars_subfolder = "hars"
 
 # Sets the Exit code, as an exitcode may only be increased and not decreased
 def setExit(code, prevcode)
@@ -38,6 +39,14 @@ def setExit(code, prevcode)
   elsif code > prevcode
     return code
   end
+end
+
+def writeHar(url, hars_subfolder, output_har)
+  # Open the command file and truncate it to 0 if exist
+  har_file=URI.parse(url).host + ".har"
+  har = File.open("#{hars_subfolder}/#{har_file}", "w")
+  har.write(output_har)
+  har.close
 end
 
 # Argument parser
@@ -165,6 +174,23 @@ rescue Timeout::Error => e
   exit exitcode
 end
 
+# split output in HAR part and Nagios part
+separator_found = false
+output_nagios = ""
+output_har = ""
+output.each_line do |line|
+  if separator_found == false
+    if line.match('^#### separator ####$')
+      separator_found = true
+      next
+    end
+    output_nagios = output_nagios + line
+  else
+    output_har = output_har + line
+  end # if separator_found
+end
+output = output_nagios
+
 # Debug output
 begin
   warn "JSON Output:\n" + output if options[:verbosity] == 3
@@ -289,8 +315,10 @@ end # status
 if exitcode == 0
   output = "OK: " + output
 elsif exitcode == 1
+  writeHar(options[:url], hars_subfolder, output_har)
   output = "WARNING: " + output
 elsif exitcode == 2
+  writeHar(options[:url], hars_subfolder, output_har)
   output = "CRITICAL: " + output
 end
 if options[:perf] == true
