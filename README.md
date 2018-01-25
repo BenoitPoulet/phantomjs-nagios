@@ -2,7 +2,6 @@
 Nagios load test for Websites
 =============================
 
-
 This Nagios/Icinga plugin measure the complete load of an website.
 
 PhantomJS - headless WebKit
@@ -10,6 +9,10 @@ PhantomJS - headless WebKit
 
 This Nagios plugin uses PhantomJS for testing the load time. PhantomJS
 load and render the website as you are doing it with your browser.
+
+It will write an HAR file under hars/ in case of non-OK status.
+You can display HAR witt a viewer like this one :
+http://www.softwareishard.com/har/viewer/
 
 Command line
 ----------
