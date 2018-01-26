@@ -30,7 +30,7 @@ options[:search] = false
 exitcode = 0
 output = ""
 search_string = ""
-hars_subfolder = "hars"
+hars_subfolder = File.join(File.dirname(__FILE__), "/hars")
 
 # Sets the Exit code, as an exitcode may only be increased and not decreased
 def setExit(code, prevcode)
